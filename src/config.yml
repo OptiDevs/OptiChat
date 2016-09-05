@@ -1,0 +1,77 @@
+options:
+  prefix: '&bOptiChat &8&l»&7 '
+chatmute:
+  stats: true
+  player_chatMuted:
+    type: NONE
+    text: ''
+  player_chatUnmuted:
+    type: NONE
+    text: ''
+  server_chatMuted:
+    type: BROADCAST
+    text: '&cChat has been muted!'
+  server_chatUnmuted:
+    type: BROADCAST
+    text: '&aChat has been unmuted!'
+  player_triesChat:
+    type: ACTION_BAR
+    text: '&c&l&oHey!&7&l Chat is muted and you my not speak!'
+  player_triesCommand:
+    type: ACTION_BAR
+    text: '&c&l&oHey!&7&l Chat is muted and you my not use that command!'
+  blockedCommands:
+  - me
+  - say
+clearChat:
+  blankLines: 256
+  endMessage:
+  - '&bChat was cleared by %p'
+AntiSwear:
+  words:
+  - motherfucker
+  - fucking
+  - shiting
+  - shitting
+  - fuck
+  - shit
+  - bitch
+  - nigger
+  - ass
+  - slut
+  - dick
+  - penis
+  - vagina
+  - pussy
+  - cunt
+  - dildo
+  - whore
+  - cum
+  whitelist:
+  - glass
+  - pass
+  - null
+  actionOne:
+    type: REPLACE_WORD
+    text: '*****'
+  actionTwo:
+    type: SEND_MESSAGE
+    text: '&cYou cant say that word!'
+AntiCaps:
+  maxCapsPercent: 25
+  minLength: 4
+  uppercase-characters: ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  actionOne:
+    type: SET_LOWERCASE
+    text: ''
+  actionTwo:
+    type: SEND_MESSAGE
+    text: '&cCalm down with the CAPS there!'
+AntiAD:
+  actionOne:
+    type: REPLACE_WORD
+    text: '********'
+  actionTwo:
+    type: SEND_MESSAGE
+    text: '&cWe do &lNOT&c tollerate advertizing!'
+config: 2

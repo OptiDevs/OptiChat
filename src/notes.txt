@@ -1,0 +1,24 @@
+TYPES:
+	NONE
+		- Does nothing
+	SEND_MESSAGE
+		- Sends the player a message
+	BROADCAST
+		- Sends a message to ALL player
+	BROADCAST:<permission>
+		- Sends a message to all player with the permission
+	ACTION_BAR
+		- Sends a action bar messsage to the player
+	*TITLE
+		- Sends a title message (add text2 for subtitle text)
+	*TITLE:<fadeIn>:<stay>:<faceOut>
+		- Sends a title message with timeings, default 5:20:5 (add text2 for subtitle text)
+	*BOSSBAR
+		- Sets a boss bar to all players (for specific time in milliseconds add text2)
+	*BOSSBAR:<color>
+		- Same as bossbar, but you can change the color
+
+		
+		
+* Not implamented, planned feature
+
