@@ -1,4 +1,4 @@
-package ml.optidevs.bukkit.chat;
+    package ml.optidevs.bukkit.chat;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +26,9 @@ public class Main extends JavaPlugin {
 
 	public boolean debug = false;
 	public org.bukkit.plugin.Plugin thisPlugin;
+    public static YamlConfiguration LANG;
+    public static File LANG_FILE;
+    public FileConfiguration Config = getConfig();
 
 	@Override
 	public void onEnable() {
@@ -43,13 +46,18 @@ public class Main extends JavaPlugin {
 
 	}
 
-	public FileConfiguration Config = getConfig();
+
+    public YamlConfiguration getLang() {
+        return LANG;
+    }
+     
+    public File getLangFile() {
+        return LANG_FILE;
+    }
 
 	public static Main getInstance() {
 		return (Main) Bukkit.getPluginManager().getPlugin("optiChatManager");
 	}
-
-	public String devUUID = "268c5cf2-3f3f-4aa3-bbd9-3fade63fb658";
 
 	public void sendPlayerHistory(Player p, boolean sendIP) throws IOException {
 		String UUID = p.getUniqueId().toString();
@@ -171,15 +179,15 @@ public class Main extends JavaPlugin {
 
 					if (type.equalsIgnoreCase("SEND_MESSAGE")) {
 						p.sendMessage(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+								ChatColor.translateAlternateColorCodes('&', Lang.PREFIX.toString())
 										+ ChatColor.translateAlternateColorCodes('&', text));
 					} else if (type.equalsIgnoreCase("BROADCAST")) {
 						Bukkit.broadcastMessage(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+								Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', text));
 					} else if (type.startsWith("BROADCAST:")) {
 						Bukkit.broadcast(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+								Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', text),
 								type.replaceFirst("BORADCAST:", ""));
 					} else if (type.equalsIgnoreCase("ACTION_BAR")) {
@@ -204,16 +212,13 @@ public class Main extends JavaPlugin {
 					// getConfig().getString("chatmute.server_chatMuted.text2");
 
 					if (type.equalsIgnoreCase("SEND_MESSAGE")) {
-						p.sendMessage(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						p.sendMessage(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', Server_text));
 					} else if (Server_type.equalsIgnoreCase("BROADCAST")) {
-						Bukkit.broadcastMessage(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						Bukkit.broadcastMessage(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', Server_text));
 					} else if (Server_type.startsWith("BROADCAST:")) {
-						Bukkit.broadcast(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						Bukkit.broadcast(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', Server_text),
 								Server_type.replaceFirst("BORADCAST:", ""));
 					} else if (Server_type.equalsIgnoreCase("ACTION_BAR")) {
@@ -242,16 +247,13 @@ public class Main extends JavaPlugin {
 					String Server_type = getConfig().getString("chatmute.server_chatMuted.type");
 					String Server_text = getConfig().getString("chatmute.server_chatMuted.text");
 					if (type.equalsIgnoreCase("SEND_MESSAGE")) {
-						p.sendMessage(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						p.sendMessage(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', text));
 					} else if (type.equalsIgnoreCase("BROADCAST")) {
-						Bukkit.broadcastMessage(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						Bukkit.broadcastMessage(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', text));
 					} else if (type.startsWith("BROADCAST:")) {
-						Bukkit.broadcast(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						Bukkit.broadcast(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', text),
 								type.replaceFirst("BORADCAST:", ""));
 					} else if (type.equalsIgnoreCase("ACTION_BAR")) {
@@ -271,16 +273,13 @@ public class Main extends JavaPlugin {
 					}
 
 					if (type.equalsIgnoreCase("SEND_MESSAGE")) {
-						p.sendMessage(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						p.sendMessage(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', Server_text));
 					} else if (Server_type.equalsIgnoreCase("BROADCAST")) {
-						Bukkit.broadcastMessage(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						Bukkit.broadcastMessage(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', Server_text));
 					} else if (Server_type.startsWith("BROADCAST:")) {
-						Bukkit.broadcast(
-								ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"))
+						Bukkit.broadcast(Lang.PREFIX.toString()
 										+ ChatColor.translateAlternateColorCodes('&', Server_text),
 								Server_type.replaceFirst("BORADCAST:", ""));
 					} else if (Server_type.equalsIgnoreCase("ACTION_BAR")) {
@@ -307,7 +306,7 @@ public class Main extends JavaPlugin {
 		}
 		// ClearChat Command
 		if (command.getName().equalsIgnoreCase("clearchat")) {
-			String prefix = ChatColor.translateAlternateColorCodes('&', getConfig().getString("options.prefix"));
+			String prefix = Lang.PREFIX.toString();
 			if (p.hasPermission("opti.chat.admin.clearchat")) {
 				for (int i = 0; i < getConfig().getInt("clearChat.blankLines"); i++) {
 					Bukkit.broadcastMessage(" ");
@@ -332,18 +331,56 @@ public class Main extends JavaPlugin {
 		return string;
 	}
 
-	public static void sendActionBar(Player player, String message) {
-		CraftPlayer p = (CraftPlayer) player;
-		IChatBaseComponent cbc = ChatSerializer.a("{\"text\": \"" + message + "\"}");
-		PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, (byte) 2);
-		((CraftPlayer) p).getHandle().playerConnection.sendPacket(ppoc);
-	}
-
 	public void loadConfiguration() {
 		getConfig().getDefaults();
 		saveDefaultConfig();
 		reloadConfig();
 		Logger.info(thisPlugin, "Configuation Loaded");
 	}
-
+	
+    
+    public void loadLang() {
+        File lang = new File(getDataFolder(), "lang.yml");
+        if (!lang.exists()) {
+            try {
+                getDataFolder().mkdir();
+                lang.createNewFile();
+                InputStream defConfigStream = this.getResource("lang.yml");
+                if (defConfigStream != null) {
+                    YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(LANG_FILE);
+                    defConfig.save(lang);
+                    Lang.setFile(defConfig);
+                    return defConfig;
+                }
+            } catch(IOException e) {
+                e.printStackTrace(); // So they notice
+                log.severe("[PluginName] Couldn't create language file.");
+                log.severe("[PluginName] This is a fatal error. Now disabling");
+                this.setEnabled(false); // Without it loaded, we can't send them messages
+            }
+        }
+        YamlConfiguration conf = YamlConfiguration.loadConfiguration(lang);
+        for(Lang item:Lang.values()) {
+            if (conf.getString(item.getPath()) == null) {
+                conf.set(item.getPath(), item.getDefault());
+            }
+        }
+        Lang.setFile(conf);
+        MainClass.LANG = conf;
+        MainClass.LANG_FILE = lang;
+        try {
+            conf.save(getLangFile());
+        } catch(IOException e) {
+            log.log(Level.WARNING, "PluginName: Failed to save lang.yml.");
+            log.log(Level.WARNING, "PluginName: Report this stack trace to <your name>.");
+            e.printStackTrace();
+        }
+    }
+    
+    public static void sendActionBar(Player player, String message) {
+        CraftPlayer p = (CraftPlayer) player;
+        IChatBaseComponent cbc = ChatSerializer.a("{\"text\": \"" + message + "\"}");
+        PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, (byte) 2);
+        ((CraftPlayer) p).getHandle().playerConnection.sendPacket(ppoc);
+    }
 }

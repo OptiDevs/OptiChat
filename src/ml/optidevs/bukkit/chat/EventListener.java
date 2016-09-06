@@ -272,8 +272,7 @@ public class EventListener implements Listener {
 	public void runType(Player p, String type, String text) {
 		if (debug)
 			p.sendMessage("Running type " + type + " with text " + text);
-		String prefix = ChatColor.translateAlternateColorCodes('&',
-				Main.getInstance().getConfig().getString("options.prefix"));
+		String prefix = Lang.PREFIX.toString());
 		if (type.equalsIgnoreCase("SEND_MESSAGE")) {
 			p.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', text));
 		} else if (type.equalsIgnoreCase("BROADCAST")) {
