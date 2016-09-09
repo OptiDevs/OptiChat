@@ -14,9 +14,9 @@ commands:
  MuteChat:
     description: Toggles chat mute
     aliases: [mc, mchat, chatmute]
- OptiChatManager:
+ OptiChat:
     description: Main command for plugin
-    aliases: [oc, Optichat, chatOpti, pChat]
+    aliases: [oc, chatOpti, oChat]
 
 permissions:
   Opti.chat.*:

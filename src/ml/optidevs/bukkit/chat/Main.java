@@ -1,59 +1,70 @@
-    package ml.optidevs.bukkit.chat;
+package ml.optidevs.bukkit.chat;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Level;
 
-import org.apache.commons.io.IOExceptionWithCause;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import ml.voltaic.bukkitapi.Logger;
-import net.minecraft.server.v1_10_R1.IChatBaseComponent;
-import net.minecraft.server.v1_10_R1.IChatBaseComponent.ChatSerializer;
-import net.minecraft.server.v1_10_R1.PacketPlayOutChat;
+import ml.optidevs.bukkit.chat.commands.AntiAD;
+import ml.optidevs.bukkit.chat.commands.AntiCaps;
+import ml.optidevs.bukkit.chat.commands.AntiSwear;
+import ml.optidevs.bukkit.chat.commands.ClearChat;
+import ml.optidevs.bukkit.chat.commands.MuteChat;
 
 public class Main extends JavaPlugin {
-	public EventListener listener = new EventListener();
 
 	public boolean debug = false;
 	public org.bukkit.plugin.Plugin thisPlugin;
-    public static YamlConfiguration LANG;
-    public static File LANG_FILE;
-    public FileConfiguration Config = getConfig();
+	public static YamlConfiguration LANG;
+	public static File LANG_FILE;
+	public FileConfiguration Config = getConfig();
+	public java.util.logging.Logger Logger = getServer().getLogger();
 
 	@Override
 	public void onEnable() {
 		thisPlugin = Bukkit.getPluginManager().getPlugin(getName());
-		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvents(new EventListener(), this);
-
-		Logger.info(null, "Plugin Enabled");
+		registerEvents(this, new OtherEvents(this), new MuteChat(this), new AntiAD(this), new AntiSwear(this),
+				new AntiCaps(this));
+		loadLang();
+		Logger.info("[OptiChat] Plugin Enabled");
 		loadConfiguration();
+		getCommand("ClearChat").setExecutor(new ClearChat(this));
+		getCommand("MuteChat").setExecutor(new MuteChat(this));
+		getCommand("MuteChat").setAliases(getConfig().getStringList("chatmute.Aliases"));
+		getCommand("ClearChat").setAliases(getConfig().getStringList("clearChat.Aliases"));
+		getCommand("OptiChat").setAliases(getConfig().getStringList("options.Aliases"));
 	}
 
 	@Override
 	public void onDisable() {
-		Logger.info(null, "Plugin Disabled");
+		Logger.info("[OptiChat] Plugin Disabled");
 
 	}
 
+	public static void registerEvents(org.bukkit.plugin.Plugin plugin, Listener... listeners) {
+		for (Listener listener : listeners) {
+			Bukkit.getServer().getPluginManager().registerEvents(listener, plugin);
+		}
+	}
 
-    public YamlConfiguration getLang() {
-        return LANG;
-    }
-     
-    public File getLangFile() {
-        return LANG_FILE;
-    }
+	public YamlConfiguration getLang() {
+		return LANG;
+	}
+
+	public File getLangFile() {
+		return LANG_FILE;
+	}
 
 	public static Main getInstance() {
 		return (Main) Bukkit.getPluginManager().getPlugin("optiChatManager");
@@ -100,7 +111,7 @@ public class Main extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Player p = (Player) sender;
 
-		if (label.equalsIgnoreCase("mcm") || command.getName().equalsIgnoreCase("optiChatManager")) {
+		if (command.getName().equalsIgnoreCase("OptiChat")) {
 			if (args.length == 0) {
 				p.sendMessage("Derp :P");
 				return true;
@@ -115,11 +126,9 @@ public class Main extends JavaPlugin {
 			} else if (args[0].equalsIgnoreCase("debug") && p.hasPermission("opti.admin")) {
 				if (debug) {
 					debug = false;
-					listener.debug = false;
 					p.sendMessage("Debug: OFF");
 				} else {
 					debug = true;
-					listener.debug = true;
 					p.sendMessage("Debug: ON");
 				}
 				return true;
@@ -165,164 +174,6 @@ public class Main extends JavaPlugin {
 
 			return true;
 		}
-
-		if (label.equalsIgnoreCase("mutechat") || label.equalsIgnoreCase("mc")) {
-			if (p.hasPermission("opti.chat.admin.mutechat")) {
-				if (!getConfig().getBoolean("chatmute.stats")) {
-					getConfig().set("chatmute.stats", true);
-					saveConfig();
-
-					String type = getConfig().getString("chatmute.player_chatUnmuted.type");
-					String text = getConfig().getString("chatmute.player_chatUnmuted.text");
-					// String text2 =
-					// getConfig().getString("chatmute.player_chatMuted.text2");
-
-					if (type.equalsIgnoreCase("SEND_MESSAGE")) {
-						p.sendMessage(
-								ChatColor.translateAlternateColorCodes('&', Lang.PREFIX.toString())
-										+ ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.equalsIgnoreCase("BROADCAST")) {
-						Bukkit.broadcastMessage(
-								Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.startsWith("BROADCAST:")) {
-						Bukkit.broadcast(
-								Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', text),
-								type.replaceFirst("BORADCAST:", ""));
-					} else if (type.equalsIgnoreCase("ACTION_BAR")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.equalsIgnoreCase("TITLE")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.startsWith("TITLE:")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.equalsIgnoreCase("BOSSBAR")) {
-						Bukkit.createBossBar(ChatColor.translateAlternateColorCodes('&', text), BarColor.PURPLE,
-								BarStyle.SEGMENTED_20);
-					} else if (type.startsWith("BOSSBAR:")) {
-						Bukkit.createBossBar(ChatColor.translateAlternateColorCodes('&', text), BarColor.PURPLE,
-								BarStyle.SEGMENTED_20);
-					} else {
-
-					}
-
-					String Server_type = getConfig().getString("chatmute.server_chatUnmuted.type");
-					String Server_text = getConfig().getString("chatmute.server_chatUnmuted.text");
-					// String Server_text2 =
-					// getConfig().getString("chatmute.server_chatMuted.text2");
-
-					if (type.equalsIgnoreCase("SEND_MESSAGE")) {
-						p.sendMessage(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.equalsIgnoreCase("BROADCAST")) {
-						Bukkit.broadcastMessage(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.startsWith("BROADCAST:")) {
-						Bukkit.broadcast(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', Server_text),
-								Server_type.replaceFirst("BORADCAST:", ""));
-					} else if (Server_type.equalsIgnoreCase("ACTION_BAR")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.equalsIgnoreCase("TITLE")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.startsWith("TITLE:")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.equalsIgnoreCase("BOSSBAR")) {
-						Bukkit.createBossBar(ChatColor.translateAlternateColorCodes('&', Server_text), BarColor.PURPLE,
-								BarStyle.SEGMENTED_20);
-					} else if (Server_type.startsWith("BOSSBAR:")) {
-						Bukkit.createBossBar(ChatColor.translateAlternateColorCodes('&', Server_text), BarColor.PURPLE,
-								BarStyle.SEGMENTED_20);
-					} else {
-
-					}
-
-					return true;
-				} else {
-					getConfig().set("chatmute.stats", false);
-					saveConfig();
-
-					String type = getConfig().getString("chatmute.player_chatMuted.type");
-					String text = getConfig().getString("chatmute.player_chatMuted.text");
-					String Server_type = getConfig().getString("chatmute.server_chatMuted.type");
-					String Server_text = getConfig().getString("chatmute.server_chatMuted.text");
-					if (type.equalsIgnoreCase("SEND_MESSAGE")) {
-						p.sendMessage(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.equalsIgnoreCase("BROADCAST")) {
-						Bukkit.broadcastMessage(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.startsWith("BROADCAST:")) {
-						Bukkit.broadcast(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', text),
-								type.replaceFirst("BORADCAST:", ""));
-					} else if (type.equalsIgnoreCase("ACTION_BAR")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.equalsIgnoreCase("TITLE")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.startsWith("TITLE:")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', text));
-					} else if (type.equalsIgnoreCase("BOSSBAR")) {
-						Bukkit.createBossBar(ChatColor.translateAlternateColorCodes('&', text), BarColor.PURPLE,
-								BarStyle.SEGMENTED_20);
-					} else if (type.startsWith("BOSSBAR:")) {
-						Bukkit.createBossBar(ChatColor.translateAlternateColorCodes('&', text), BarColor.PURPLE,
-								BarStyle.SEGMENTED_20);
-					} else {
-
-					}
-
-					if (type.equalsIgnoreCase("SEND_MESSAGE")) {
-						p.sendMessage(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.equalsIgnoreCase("BROADCAST")) {
-						Bukkit.broadcastMessage(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.startsWith("BROADCAST:")) {
-						Bukkit.broadcast(Lang.PREFIX.toString()
-										+ ChatColor.translateAlternateColorCodes('&', Server_text),
-								Server_type.replaceFirst("BORADCAST:", ""));
-					} else if (Server_type.equalsIgnoreCase("ACTION_BAR")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.equalsIgnoreCase("TITLE")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.startsWith("TITLE:")) {
-						sendActionBar(p, ChatColor.translateAlternateColorCodes('&', Server_text));
-					} else if (Server_type.equalsIgnoreCase("BOSSBAR")) {
-						Bukkit.createBossBar(ChatColor.translateAlternateColorCodes('&', Server_text), BarColor.PURPLE,
-								BarStyle.SEGMENTED_20);
-					} else if (Server_type.startsWith("BOSSBAR:")) {
-						Bukkit.createBossBar(ChatColor.translateAlternateColorCodes('&', Server_text), BarColor.PURPLE,
-								BarStyle.SEGMENTED_20);
-					} else {
-
-					}
-					return true;
-				}
-			} else {
-				p.sendMessage(ChatColor.RED + "You are lacking the required permission node!");
-				return true;
-			}
-		}
-		// ClearChat Command
-		if (command.getName().equalsIgnoreCase("clearchat")) {
-			String prefix = Lang.PREFIX.toString();
-			if (p.hasPermission("opti.chat.admin.clearchat")) {
-				for (int i = 0; i < getConfig().getInt("clearChat.blankLines"); i++) {
-					Bukkit.broadcastMessage(" ");
-				}
-				for (String s : getConfig().getStringList("clearChat.endMessage")) {
-					Bukkit.broadcastMessage(
-							prefix + ChatColor.translateAlternateColorCodes('&', s.replaceAll("%p", p.getName())));
-				}
-				return true;
-			} else {
-				p.sendMessage(ChatColor.RED + "You are lacking the required permission node!");
-				return true;
-
-			}
-		}
-
 		return false;
 	}
 
@@ -335,52 +186,58 @@ public class Main extends JavaPlugin {
 		getConfig().getDefaults();
 		saveDefaultConfig();
 		reloadConfig();
-		Logger.info(thisPlugin, "Configuation Loaded");
+		Logger.info("[OptiDevs] Configuation Loaded");
 	}
-	
-    
-    public void loadLang() {
-        File lang = new File(getDataFolder(), "lang.yml");
-        if (!lang.exists()) {
-            try {
-                getDataFolder().mkdir();
-                lang.createNewFile();
-                InputStream defConfigStream = this.getResource("lang.yml");
-                if (defConfigStream != null) {
-                    YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(LANG_FILE);
-                    defConfig.save(lang);
-                    Lang.setFile(defConfig);
-                    return defConfig;
-                }
-            } catch(IOException e) {
-                e.printStackTrace(); // So they notice
-                log.severe("[PluginName] Couldn't create language file.");
-                log.severe("[PluginName] This is a fatal error. Now disabling");
-                this.setEnabled(false); // Without it loaded, we can't send them messages
-            }
-        }
-        YamlConfiguration conf = YamlConfiguration.loadConfiguration(lang);
-        for(Lang item:Lang.values()) {
-            if (conf.getString(item.getPath()) == null) {
-                conf.set(item.getPath(), item.getDefault());
-            }
-        }
-        Lang.setFile(conf);
-        MainClass.LANG = conf;
-        MainClass.LANG_FILE = lang;
-        try {
-            conf.save(getLangFile());
-        } catch(IOException e) {
-            log.log(Level.WARNING, "PluginName: Failed to save lang.yml.");
-            log.log(Level.WARNING, "PluginName: Report this stack trace to <your name>.");
-            e.printStackTrace();
-        }
-    }
-    
-    public static void sendActionBar(Player player, String message) {
-        CraftPlayer p = (CraftPlayer) player;
-        IChatBaseComponent cbc = ChatSerializer.a("{\"text\": \"" + message + "\"}");
-        PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, (byte) 2);
-        ((CraftPlayer) p).getHandle().playerConnection.sendPacket(ppoc);
-    }
+
+	public void loadLang() {
+		File lang = new File(getDataFolder(), "lang.yml");
+		if (!lang.exists()) {
+			try {
+				getDataFolder().mkdir();
+				lang.createNewFile();
+				InputStream defConfigStream = this.getResource("lang.yml");
+				if (defConfigStream != null) {
+					YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(LANG_FILE);
+					defConfig.save(lang);
+					Lang.setFile(defConfig);
+					return;
+				}
+			} catch (IOException e) {
+				Logger.severe("[OptiChat] Couldn't create language file.");
+				Logger.severe("[OptiChat] This is a fatal error. Now disabling");
+			}
+		}
+		YamlConfiguration conf = YamlConfiguration.loadConfiguration(lang);
+		for (Lang item : Lang.values()) {
+			if (conf.getString(item.getPath()) == null) {
+				conf.set(item.getPath(), item.getDefault());
+			}
+		}
+		Lang.setFile(conf);
+		Main.LANG = conf;
+		Main.LANG_FILE = lang;
+		try {
+			conf.save(getLangFile());
+		} catch (IOException e) {
+			e.printStackTrace();
+			Logger.log(Level.SEVERE, "[OptiChat] Failed to save lang.yml.");
+			Logger.log(Level.SEVERE, "[OptiChat] Report this stack trace to OptiDevs.");
+		}
+	}
+
+	public void runType(CommandSender s, String type, String text) {
+		if(s == null || type == null || text == null){
+			return;
+		}
+		
+		String prefix = Lang.PREFIX.toString();
+		if (type.equalsIgnoreCase("SEND_MESSAGE")) {
+			s.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', text));
+		} else if (type.equalsIgnoreCase("BROADCAST")) {
+			Bukkit.broadcastMessage(prefix + ChatColor.translateAlternateColorCodes('&', text));
+		} else if (type.startsWith("BROADCAST:")) {
+			Bukkit.broadcast(prefix + ChatColor.translateAlternateColorCodes('&', text),
+					type.replaceFirst("BORADCAST:", ""));
+		}
+	}
 }

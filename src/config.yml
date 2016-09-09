@@ -1,5 +1,9 @@
 options:
   prefix: '&bOptiChat &8&l»&7 '
+  aliases:
+  - oc
+  - chatOpti
+  - oChat
 chatmute:
   stats: true
   player_chatMuted:
@@ -15,18 +19,42 @@ chatmute:
     type: BROADCAST
     text: '&aChat has been unmuted!'
   player_triesChat:
-    type: ACTION_BAR
-    text: '&c&l&oHey!&7&l Chat is muted and you my not speak!'
+    type: SEND_MESSAGE
+    text: '&c&lHey!&7 Chat is muted and you my not speak!'
   player_triesCommand:
-    type: ACTION_BAR
-    text: '&c&l&oHey!&7&l Chat is muted and you my not use that command!'
+    type: SEND_MESSAGE
+    text: '&c&lHey!&7 Chat is muted and you my not use that command!'
+  Aliases:
+  - mc
+  - mchat
+  - chatmute
   blockedCommands:
   - me
   - say
+  - msg
+  - tell
+  - w
+  - r
+  - emsg
+  - er
+  - etell
+  - ew
+  - eme
+  - esay
+  - broadcast
+  - bc
+  - ebc
+  - ebroadcast
 clearChat:
   blankLines: 256
   endMessage:
   - '&bChat was cleared by %p'
+  Aliases:
+  - occ
+  - cc
+  - cclear
+  - chatclear
+  - clearc
 AntiSwear:
   words:
   - motherfucker
