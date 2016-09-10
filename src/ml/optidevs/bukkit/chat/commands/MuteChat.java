@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import ml.optidevs.bukkit.chat.Lang;
 import ml.optidevs.bukkit.chat.Main;
+import ml.optidevs.bukkit.chat.Perm;
 
 public class MuteChat implements CommandExecutor, Listener {
 	private Main m = null;
@@ -22,7 +23,7 @@ public class MuteChat implements CommandExecutor, Listener {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (!(sender.hasPermission("opti.chat.admin.mutechat"))) {
+		if (!(sender.hasPermission(Perm.ADMIN.MUTECHAT))) {
 			sender.sendMessage(Lang.NO_PERMS.toString());
 			return true;
 		}
@@ -57,7 +58,7 @@ public class MuteChat implements CommandExecutor, Listener {
 	public void chatMuteCheck(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
 		boolean stats = m.getConfig().getBoolean("chatmute.stats");
-		if (!(stats || p.hasPermission("opti.chat.bypass.mute"))) {
+		if (!(stats || p.hasPermission(Perm.BYPASS.MUTE))) {
 			String type = m.getConfig().getString("chatmute.player_triesChat.type");
 			String text = m.getConfig().getString("chatmute.player_triesChat.text");
 			Main.getInstance().runType(p, type, text);
@@ -76,7 +77,7 @@ public class MuteChat implements CommandExecutor, Listener {
 		if (p.isOp())
 			return;
 
-		if (p.hasPermission("opti.chat.bypass.mute"))
+		if (p.hasPermission(Perm.BYPASS.MUTE))
 			return;
 
 		if (!stats) {

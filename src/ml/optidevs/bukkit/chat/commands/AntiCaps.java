@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import ml.optidevs.bukkit.chat.Main;
+import ml.optidevs.bukkit.chat.Perm;
 
 public class AntiCaps implements Listener {
 	private Main m = null;
@@ -25,7 +26,7 @@ public class AntiCaps implements Listener {
 		boolean loggedCaps = false;
 		boolean notiCaps = false;
 
-		if (!e.getPlayer().hasPermission("opti.chat.bypass.caps")) {
+		if (!e.getPlayer().hasPermission(Perm.BYPASS.CAPS)) {
 			if (stats || !p.hasPermission("opti.chat.bypass.mute")) {
 				int minLength = m.getConfig().getInt("AntiCaps.minLength");
 				int precent = m.getConfig().getInt("AntiCaps.maxCapsPercent");

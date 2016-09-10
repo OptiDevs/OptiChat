@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import ml.optidevs.bukkit.chat.Lang;
 import ml.optidevs.bukkit.chat.Main;
+import ml.optidevs.bukkit.chat.Perm;
 
 public class ClearChat implements CommandExecutor {
 	private Main m = null;
@@ -19,7 +20,7 @@ public class ClearChat implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		String prefix = Lang.PREFIX.toString();
-		if (sender.hasPermission("opti.chat.admin.clearchat")) {
+		if (sender.hasPermission(Perm.ADMIN.CLEARCHAT)) {
 			for (int i = 0; i < m.getConfig().getInt("clearChat.blankLines"); i++) {
 				Bukkit.broadcastMessage("");
 			}
@@ -29,7 +30,7 @@ public class ClearChat implements CommandExecutor {
 			}
 			return true;
 		} else {
-			sender.sendMessage(ChatColor.RED + "You are lacking the required permission node!");
+			sender.sendMessage(Lang.NO_PERMS.toString());
 			return true;
 
 		}

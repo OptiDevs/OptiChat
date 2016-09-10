@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import ml.optidevs.bukkit.chat.commands.AntiAD;
@@ -115,15 +116,15 @@ public class Main extends JavaPlugin {
 			if (args.length == 0) {
 				p.sendMessage("Derp :P");
 				return true;
-			} else if (args[0].equalsIgnoreCase("reload") && p.hasPermission("opti.admin.reload")) {
+			} else if (args[0].equalsIgnoreCase("reload") && p.hasPermission(Perm.ADMIN.RELOAD)) {
 				reloadConfig();
 				p.sendMessage("Config reloaded!");
 				return true;
-			} else if (args[0].equalsIgnoreCase("save") && p.hasPermission("opti.admin.reload")) {
+			} else if (args[0].equalsIgnoreCase("save") && p.hasPermission(Perm.ADMIN.RELOAD)) {
 				saveConfig();
 				p.sendMessage("Config saved!");
 				return true;
-			} else if (args[0].equalsIgnoreCase("debug") && p.hasPermission("opti.admin")) {
+			} else if (args[0].equalsIgnoreCase("debug") && p.hasPermission(Perm.ADMIN.ALL)) {
 				if (debug) {
 					debug = false;
 					p.sendMessage("Debug: OFF");

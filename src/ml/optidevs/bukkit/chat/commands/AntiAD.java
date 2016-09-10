@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import ml.optidevs.bukkit.chat.Main;
+import ml.optidevs.bukkit.chat.Perm;
 
 public class AntiAD implements Listener {
 	private Main m = null;
@@ -22,7 +23,7 @@ public class AntiAD implements Listener {
 		boolean loggedAD = false;
 		boolean notiAD = false;
 
-		if (stats && !p.hasPermission("opti.chat.bypass.ad")) {
+		if (stats && !p.hasPermission(Perm.BYPASS.AD)) {
 			final String s = e.getMessage();
 			String[] words = s.split("\\s+");
 			String[] wordsO = s.split("\\s+");

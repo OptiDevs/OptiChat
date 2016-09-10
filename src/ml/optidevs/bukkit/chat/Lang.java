@@ -17,28 +17,14 @@ public enum Lang {
 	NO_PERMS("no-permissions", "&cYou don''t have permission for that!");
 
 	private String path;
-	private String def;
+	private String value;
 	private static YamlConfiguration LANG;
 
-	/**
-	 * Lang enum constructor.
-	 * 
-	 * @param path
-	 *            The string path.
-	 * @param start
-	 *            The default string.
-	 */
-	Lang(String path, String start) {
+	Lang(String path, String value, String... args) {
 		this.path = path;
-		this.def = start;
+		this.value = value;
 	}
 
-	/**
-	 * Set the {@code YamlConfiguration} to use.
-	 * 
-	 * @param config
-	 *            The config to set.
-	 */
 	public static void setFile(YamlConfiguration config) {
 		LANG = config;
 	}
@@ -46,24 +32,14 @@ public enum Lang {
 	@Override
 	public String toString() {
 		if (this == PREFIX)
-			return ChatColor.translateAlternateColorCodes('&', LANG.getString(this.path, def)) + " ";
-		return ChatColor.translateAlternateColorCodes('&', LANG.getString(this.path, def));
+			return ChatColor.translateAlternateColorCodes('&', LANG.getString(this.path, value)) + " ";
+		return ChatColor.translateAlternateColorCodes('&', LANG.getString(this.path, value));
 	}
 
-	/**
-	 * Get the default value of the path.
-	 * 
-	 * @return The default value of the path.
-	 */
 	public String getDefault() {
-		return this.def;
+		return this.value;
 	}
 
-	/**
-	 * Get the path to the string.
-	 * 
-	 * @return The path to the string.
-	 */
 	public String getPath() {
 		return this.path;
 	}

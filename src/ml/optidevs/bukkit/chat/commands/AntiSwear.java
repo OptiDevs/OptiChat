@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import ml.optidevs.bukkit.chat.Main;
+import ml.optidevs.bukkit.chat.Perm;
 
 public class AntiSwear implements Listener {
 	private Main m = null;
@@ -26,8 +27,8 @@ public class AntiSwear implements Listener {
 		boolean loggedSwear = false;
 		boolean notiSwear = false;
 
-		if (!p.hasPermission("opti.chat.bypass.swear")) {
-			if (stats || p.hasPermission("opti.chat.bypass.mute")) {
+		if (!p.hasPermission(Perm.BYPASS.SWEAR)) {
+			if (stats || p.hasPermission(Perm.BYPASS.MUTE)) {
 				for (int i = 0; i < m.getConfig().getList("AntiSwear.words").toArray().length; i++) {
 					String word = m.getConfig().getList("AntiSwear.words").toArray()[i].toString();
 					if (isWordSwearWhitelist(e.getMessage()))
