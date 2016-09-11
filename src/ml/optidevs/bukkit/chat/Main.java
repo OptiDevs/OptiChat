@@ -14,7 +14,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import ml.optidevs.bukkit.chat.commands.AntiAD;
@@ -49,7 +48,7 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		Logger.info("[OptiChat] Plugin Disabled");
+		Logger.info("[OptiChat] Pl ugin Disabled");
 
 	}
 
@@ -227,10 +226,10 @@ public class Main extends JavaPlugin {
 	}
 
 	public void runType(CommandSender s, String type, String text) {
-		if(s == null || type == null || text == null){
+		if (s == null || type == null || text == null) {
 			return;
 		}
-		
+
 		String prefix = Lang.PREFIX.toString();
 		if (type.equalsIgnoreCase("SEND_MESSAGE")) {
 			s.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', text));
@@ -241,4 +240,6 @@ public class Main extends JavaPlugin {
 					type.replaceFirst("BORADCAST:", ""));
 		}
 	}
+	
+
 }
